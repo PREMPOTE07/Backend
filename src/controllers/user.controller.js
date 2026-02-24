@@ -270,6 +270,57 @@ const updateAccountDetails = asyncHandler(async(req,res) => {
     .json(new ApiResponse(200,User,"Account Details Update Successfully"))
 })
 
+const updateUserAvatar = asyncHandler(async (req,res) => {
+      const avtarLocalPath = req.file?.path
+
+      if(!avtarLocalPath){
+        throw new ApiError(400,"Avtar file is missing")
+      }
+
+      const avtar = await uploadOnCloudinary(avtarLocalPath)
+      
+      if(!avtar.url){
+        throw new ApiError(400,"Error while uploading on avtar")
+      }
+
+      const User = await user.findByIdAndUpdate(req.User?._id,
+        {
+            $set: {
+                avtar: avtar.url
+            }
+        },
+        {returnDocument:'after'}
+    ).select("-password")
+
+    return res.status(200)
+    .json(new ApiResponse(200,User,"User Avtar update successfully"))
+})
+
+const updateUserCoverImage = asyncHandler(async (req,res) => {
+      const coverImageLocalPath = req.file?.path
+
+      if(!coverImageLocalPath){
+        throw new ApiError(400,"Cover Image file is missing")
+      }
+
+      const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+      
+      if(!coverImage.url){
+        throw new ApiError(400,"Error while uploading on Cover Image")
+      }
+
+      const User = await user.findByIdAndUpdate(req.User?._id,
+        {
+            $set: {
+                coverImage: coverImage.url
+            }
+        },
+        {returnDocument:'after'}
+    ).select("-password")
+
+    return res.status(200)
+    .json(new ApiResponse(200,User,"User Cover Image update successfully"))
+})
 
 export {
     registerUser,
@@ -278,5 +329,7 @@ export {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
-    updateAccountDetails
+    updateAccountDetails,
+    updateUserAvatar,
+    updateUserCoverImage
 }
